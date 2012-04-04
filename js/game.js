@@ -1,5 +1,7 @@
 (function () {
 	"use strict";
+	var base_directory = "../",
+		current_game;
 	function actor(x, y, health, image, secret) {
 		secret = secret || {};
 		var self = {};
@@ -105,9 +107,9 @@
 			gamestate = gameState();
 		self.init = function () {
 			images.enemyimg1 = new Image();
-			images.enemyimg1.src = '/thormme/vhoot/workspace/images/redtri.svg';
+			images.enemyimg1.src = base_directory + 'images/redtri.svg';
 			images.playerimg1 = new Image();
-			images.playerimg1.src = '/thormme/vhoot/workspace/images/bluetri.svg';
+			images.playerimg1.src = base_directory + 'images/bluetri.svg';
 			gamestate.addActor(enemy(12, 40, 1, images.enemyimg1));
 			gamestate.addActor(player(100, 100, 1, images.playerimg1));
 			setInterval(self.run, 20);
@@ -121,7 +123,7 @@
 		};
 		return self;
 	}
-	var current_game = game();
+	current_game = game();
 	current_game.init();
 }());
 
