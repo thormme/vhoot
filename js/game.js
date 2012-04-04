@@ -7,6 +7,10 @@
 		secret.y = y;
 		secret.health = health;
 		secret.image = image;
+		secret.type = "actor";
+		self.getType = function () {
+			return secret.type;
+		};
 		self.getX = function () {
 			return secret.x;
 		};
@@ -44,6 +48,10 @@
 		secret = secret || {};
 		var self = actor(x, y, health, image, secret),
 			super_run = self.run;
+		secret.type = "enemy";
+		self.getType = function () {
+			return secret.type;
+		};
 		self.run = function (gamestate, canvas_context) {
 			secret.y += 1;
 			super_run(gamestate, canvas_context);
@@ -54,6 +62,10 @@
 		secret = secret || {};
 		var self = actor(x, y, health, image, secret),
 			super_run = self.run;
+		secret.type = "player";
+		self.getType = function () {
+			return secret.type;
+		};
 		self.run = function (gamestate, canvas_context) {
 			secret.y -= 1;
 			super_run(gamestate, canvas_context);
@@ -67,15 +79,15 @@
 			actors.push(actor);
 		};
 		self.getActors = function (actortype) {
-			actortype = typeof actortype !== 'undefined' ? actortype : Object;
+			actortype = typeof actortype !== 'undefined' ? actortype : "actor";
 			var acts = [],
 				i;
 			for (i = 0; i < actors.length; i++) {
-				if (actors[i] instanceof actortype) {
+				if (actors[i].getType() === actortype || actortype === "actor") {
 					acts.push(actors[i]);
 				}
 			}
-			return actors;
+			return acts;
 		};
 		self.run = function (gamestate, context) {
 			var i;
