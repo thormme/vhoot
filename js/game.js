@@ -2,6 +2,28 @@
 	"use strict";
 	var base_directory = "../",
 		current_game;
+	function inputState() {
+		var self = {},
+			pressedkeys = [];
+		self.keys = {
+			LEFT: 37,
+			UP: 38,
+			RIGHT: 39,
+			DOWN: 40
+		};
+		self.isKeyPressed = function (code) {
+			return pressedkeys[code] || false;
+		};
+		self.onKeyup = function (event) {
+			pressedkeys[event.keyCode] = false;
+		};
+		self.onKeydown = function (event) {
+			pressedkeys[event.keyCode] = true;
+		};
+		document.addEventListener('keyup', function (event) { self.onKeyup(event); }, false);
+		document.addEventListener('keydown', function (event) { self.onKeydown(event); }, false);
+		return self;
+	}
 	function actor(x, y, health, image, secret) {
 		secret = secret || {};
 		var self = {};
@@ -51,9 +73,6 @@
 		var self = actor(x, y, health, image, secret),
 			super_run = self.run;
 		secret.type = "enemy";
-		self.getType = function () {
-			return secret.type;
-		};
 		self.run = function (gamestate, canvas_context) {
 			secret.y += 1;
 			super_run(gamestate, canvas_context);
@@ -65,11 +84,19 @@
 		var self = actor(x, y, health, image, secret),
 			super_run = self.run;
 		secret.type = "player";
-		self.getType = function () {
-			return secret.type;
-		};
-		self.run = function (gamestate, canvas_context) {
-			secret.y -= 1;
+		self.run = function (gamestate, canvas_context, input) {
+			if (input.isKeyPressed(input.keys.UP)) {
+				secret.y -= 2;
+			}
+			if (input.isKeyPressed(input.keys.DOWN)) {
+				secret.y += 2;
+			}
+			if (input.isKeyPressed(input.keys.LEFT)) {
+				secret.x -= 2;
+			}
+			if (input.isKeyPressed(input.keys.RIGHT)) {
+				secret.x += 2;
+			}
 			super_run(gamestate, canvas_context);
 	    };
 		return self;
@@ -91,10 +118,10 @@
 			}
 			return acts;
 		};
-		self.run = function (gamestate, context) {
+		self.run = function (gamestate, context, input) {
 			var i;
 			for (i = 0; i < actors.length; i++) {
-				actors[i].run(gamestate, context);
+				actors[i].run(gamestate, context, input);
 			}
 		};
 		return self;
@@ -104,7 +131,8 @@
 			canvas = document.getElementById('canvas'),
 			ctx = canvas.getContext('2d'),
 			images = {},
-			gamestate = gameState();
+			gamestate = gameState(),
+			input = inputState();
 		self.init = function () {
 			images.enemyimg1 = new Image();
 			images.enemyimg1.src = base_directory + 'images/redtri.svg';
@@ -119,7 +147,7 @@
 			ctx.setTransform(1, 0, 0, 1, 0, 0);
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			ctx.restore();
-			gamestate.run(gamestate, ctx);
+			gamestate.run(gamestate, ctx, input);
 		};
 		return self;
 	}
